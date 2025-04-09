@@ -29,7 +29,7 @@ if(isset($_GET["seq"])){
 	echo "Error";
 }
 
-$data = httpRequest('http://192.168.0.186:8000/law/select-contract-requestpayment', json_encode($data));
+$data = httpRequest('http://192.168.0.52:8000/law/select-contract-requestpayment', json_encode($data));
 $Data = $data['Data'];
 // echo json_encode($data, JSON_UNESCAPED_UNICODE);
 
@@ -279,7 +279,7 @@ $footer->addPreserveText('第 {PAGE} 頁，共 {NUMPAGES} 頁', null, array('ali
 $HeaderStyle = array('borderColor' => '999999', 'cellMarginLeft' => 200, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::END);
 $phpWord->addTableStyle('Header Row Style', $HeaderStyle);
 $HeaderTable = $section->addTable('Header Row Style');
-$width = 2500;
+$width = 3333;
 $HeaderSpan = array('gridSpan' => 3, 'vMerge' => 'restart');
 $AlignRight = array('align' => 'right');
 $AlignCenter = array('align' => 'center');
@@ -398,9 +398,9 @@ if($data['Code'] == 200) {
 
 	$TitleRow = $TitleTable->addRow();
 	$TitleRow->addCell($width, $DashedStyle)->addTextRun($TextEnd)->addText('顧問期間：');
-	$TitleRow->addCell(3000, $DashedContentSingleStyle)->addTextRun($TextRun)->addText(ContractSEDate($Data['ContractSDate']));
-	$TitleRow->addCell(1500, $DashedContentSingleStyle)->addTextRun($TextRun)->addText('至');
-	$TitleRow->addCell(3000, $DashedContentSingleStyle)->addTextRun($TextRun)->addText(ContractSEDate($Data['ContractEDate']));
+	$TitleRow->addCell(2750, $DashedContentSingleStyle)->addTextRun($TextRun)->addText(ContractSEDate($Data['ContractSDate']));
+	$TitleRow->addCell(1250, $DashedContentSingleStyle)->addTextRun($TextRun)->addText('至');
+	$TitleRow->addCell(2750, $DashedContentSingleStyle)->addTextRun($TextRun)->addText(ContractSEDate($Data['ContractEDate']));
 
 	$TitleRow = $TitleTable->addRow();
 	$TitleRow->addCell($width)->addTextRun($TextEnd)->addText('本所編號：');
@@ -435,12 +435,12 @@ if ($Data['PaymentType'] == "P") {
 
 			$DetailsRow = $DetailsTable->addRow();
 			$DetailsRow->addCell($width, $CellCenter)->addTextRun($TextRun)->addText('期間');
-			$DetailsRow->addCell($width, array('gridSpan' => 3, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText(Period($Data['WorkDate']));
+			$DetailsRow->addCell($width, array('gridSpan' => 2, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText(Period($Data['WorkDate']));
 
 			$DetailsRow = $DetailsTable->addRow();
 			$DetailsRow->addCell($width)->addTextRun($TextRun)->addText('日期');
 			$DetailsRow->addCell($width)->addTextRun($TextRun)->addText('合計時數');
-			$DetailsRow->addCell($width)->addTextRun($TextRun)->addText('案別');
+			// $DetailsRow->addCell($width)->addTextRun($TextRun)->addText('案別');
 			$DetailsRow->addCell($width)->addTextRun($TextRun)->addText('內容');
 			
 			$j = 0;
@@ -450,7 +450,7 @@ if ($Data['PaymentType'] == "P") {
 					$DetailsRow = $DetailsTable->addRow();
 					$DetailsRow->addCell($width)->addTextRun($TextRun)->addText($HoursList['WorkDate']);
 					$DetailsRow->addCell($width)->addTextRun($TextRun)->addText($HoursList['WorkHours']);
-					$DetailsRow->addCell($width)->addTextRun($TextRun)->addText($HoursList['CaseName']);
+					// $DetailsRow->addCell($width)->addTextRun($TextRun)->addText($HoursList['CaseName']);
 					$DetailsRow->addCell($width)->addText($HoursList['JobDescription']);
 					$j++;
 				} else {
@@ -459,7 +459,7 @@ if ($Data['PaymentType'] == "P") {
 			}
 			$DetailsRow = $DetailsTable->addRow();
 			$DetailsRow->addCell($width, $CellCenter)->addTextRun($TextRun)->addText('共計時數');
-			$DetailsRow->addCell($width, array('gridSpan' => 3, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText($HoursData['Hours']);
+			$DetailsRow->addCell($width, array('gridSpan' => 2, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText($HoursData['Hours']);
 
 			$section->addText('●'.Period($Data['WorkDate']).$HoursData['Name'].$HoursData['Position'].'之服務時數共計'.$HoursData['Hours'].'小時。', $fontStyle , $paragraphStyle);
 
@@ -491,24 +491,24 @@ if ($Data['PaymentType'] == "All") {
 
 	$DetailsRow = $DetailsTable->addRow();
 	$DetailsRow->addCell(2000, $CellCenter)->addTextRun($TextRun)->addText('期間');
-	$DetailsRow->addCell(2000, array('gridSpan' => 4, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText(Period($Data['WorkDate']));
+	$DetailsRow->addCell(2000, array('gridSpan' => 3, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText(Period($Data['WorkDate']));
 
 	$DetailsRow = $DetailsTable->addRow();
-	$DetailsRow->addCell(2000)->addTextRun($TextRun)->addText('日期');
-	$DetailsRow->addCell(1500)->addTextRun($TextRun)->addText('負責人');
-	$DetailsRow->addCell(2000)->addTextRun($TextRun)->addText('合計時數');
-	$DetailsRow->addCell(2000)->addTextRun($TextRun)->addText('案別');
-	$DetailsRow->addCell(2500)->addTextRun($TextRun)->addText('內容');
+	$DetailsRow->addCell(2500)->addTextRun($TextRun)->addText('日期');
+	$DetailsRow->addCell(2000)->addTextRun($TextRun)->addText('負責人');
+	$DetailsRow->addCell(2500)->addTextRun($TextRun)->addText('合計時數');
+	// $DetailsRow->addCell(2000)->addTextRun($TextRun)->addText('案別');
+	$DetailsRow->addCell(3000)->addTextRun($TextRun)->addText('內容');
 
 	while(1) {
 		if(isset($Data['HoursData'][$i])) {
 			$HoursList = $Data['HoursData'][$i];
 			$DetailsRow = $DetailsTable->addRow();
-			$DetailsRow->addCell(2000)->addTextRun($TextRun)->addText($HoursList['WorkDate']);
-			$DetailsRow->addCell(1500)->addTextRun($TextRun)->addText($HoursList['Name']);
-			$DetailsRow->addCell(2000)->addTextRun($TextRun)->addText($HoursList['WorkHours']);
-			$DetailsRow->addCell(2000)->addTextRun($TextRun)->addText($HoursList['CaseName']);
-			$DetailsRow->addCell(2500)->addText($HoursList['JobDescription']);
+			$DetailsRow->addCell(2500)->addTextRun($TextRun)->addText($HoursList['WorkDate']);
+			$DetailsRow->addCell(2000)->addTextRun($TextRun)->addText($HoursList['Name']);
+			$DetailsRow->addCell(2500)->addTextRun($TextRun)->addText($HoursList['WorkHours']);
+			// $DetailsRow->addCell(2000)->addTextRun($TextRun)->addText($HoursList['CaseName']);
+			$DetailsRow->addCell(3000)->addText($HoursList['JobDescription']);
 			$i++;
 		} else {
 			break;
@@ -516,7 +516,7 @@ if ($Data['PaymentType'] == "All") {
 	}
 	$DetailsRow = $DetailsTable->addRow();
 	$DetailsRow->addCell(2000, $CellCenter)->addTextRun($TextRun)->addText('共計時數');
-	$DetailsRow->addCell(2000, array('gridSpan' => 4, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText(TotalHours($Data['HoursData'], $Data['PaymentType']));
+	$DetailsRow->addCell(2000, array('gridSpan' => 3, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText(TotalHours($Data['HoursData'], $Data['PaymentType']));
 
 	$section->addText('●'.Period($Data['WorkDate']).'服務時數共計'.TotalHours($Data['HoursData'], $Data['PaymentType']).'小時。', $fontStyle , $paragraphStyle);
 }
