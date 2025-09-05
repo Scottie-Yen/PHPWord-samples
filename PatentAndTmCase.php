@@ -45,7 +45,7 @@ $phpWord = new \PhpOffice\PhpWord\PhpWord();
 
 // New portrait section
 $section = $phpWord->addSection(array(
-	'headerHeight' => 0,
+	'headerHeight' => 300,
     'marginTop' => 2000,
 	'marginLeft' => 0,
 	'footerHeight' => 0
@@ -73,7 +73,6 @@ array(
 $HeaderStyle = array('borderColor' => '999999', 'cellMarginLeft' => 200, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::END);
 $phpWord->addTableStyle('Header Row Style', $HeaderStyle);
 $HeaderTable = $section->addTable('Header Row Style');
-$width = 3333;
 $HeaderSpan = array('gridSpan' => 3, 'vMerge' => 'restart');
 $AlignRight = array('align' => 'right');
 $AlignCenter = array('align' => 'center');
@@ -112,6 +111,7 @@ $CellCenter = array('vMerge' => 'restart', 'valign' => 'center');
 $DashedStyle = array( 
     'vMerge' => 'restart',
     'valign' => 'center',
+    'name' => 'DFKai-SB', 'size' => 12, 'hint' => 'eastAsia'
 );
 
 // 冒號樣式
@@ -137,86 +137,102 @@ $ImageStyle = array(
 	'borderBottomSize' => 1,
 );
 
+$fontBiaokai12 = ['name' => 'DFKai-SB', 'size' => 12, 'hint' => 'eastAsia']; // 標楷體 12pt
+$width = 3600;
+$TitleWidth = 2000;
+$TableWidth = 250;
+
 
 // 字體置中對其
 $TextStart = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START);
 $TextRun = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER);
 $TextEnd = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::END);
-$TextRunTop = $TextRun;                // $TextRun 是你原本的對齊設定
-$TextRunTop['spaceBefore'] = 200;      // 200 twips ≈ 0.14 in；數值可調
+$TextRunTop = $TextEnd;                // $TextRun 是你原本的對齊設定
+$TextRunTop['spaceBefore'] = 50;      // 200 twips ≈ 0.14 in；數值可調
 $TextRunTop['spaceAfter']  = 0;
+
+$LineHeight = 700;
 
 // Header start
 if($data['Code'] == 200 && $Data['PatentInfo']['FileID'] && !empty($Data['Receivable'])) {
-    $TitleRow = $NullTable->addRow(3000, ['exactHeight' => true]);
-    $TitleRow->addCell(2000, [])->addTextRun($TextRun)->addText('');
-    $TitleRow->addCell($width, $ImageStyle)->addTextRun($TextRun)->addText('');
+    $TitleRow = $NullTable->addRow(4000, ['exactHeight' => true]);
+    $TitleRow->addCell(1250, [])->addTextRun($TextRun)->addText('');
+    $TitleRow->addCell(4500, $ImageStyle)->addTextRun($TextRun)->addText('');
 
-    $TitleRow = $NullTable->addRow(500, ['exactHeight' => true]);
-    $TitleRow->addCell(2000, [])->addTextRun($TextRun)->addText('');
+    $TitleRow = $NullTable->addRow(1170, ['exactHeight' => true]);
+    $TitleRow->addCell(1250, [])->addTextRun($TextRun)->addText('');
 
-	$TitleRow = $TitleTable->addRow(900, ['exactHeight' => true]);
-    $leftCell = $TitleRow->addCell($width, $DashedStyle);
+	$TitleRow = $TitleTable->addRow($LineHeight, ['exactHeight' => true]);
+    $TitleRow->addCell($TableWidth, [])->addTextRun([])->addText('');
+    $leftCell = $TitleRow->addCell($TitleWidth, $DashedStyle);
     $leftCell->addText('客戶名稱', $DashedStyle, $TextRunTop);
-    $leftCell->addText('(CLIENT)', $DashedStyle, $TextRun);
-    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextEnd)->addText('：');
-	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['CltCName']);
+    $leftCell->addText('(CLIENT)', $DashedStyle, $TextEnd);
+    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextStart)->addText('：');
+	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['CltCName'], $fontBiaokai12);
 
-    $TitleRow = $TitleTable->addRow(900, ['exactHeight' => true]);
-    $leftCell = $TitleRow->addCell($width, $DashedStyle);
+    $TitleRow = $TitleTable->addRow($LineHeight, ['exactHeight' => true]);
+    $TitleRow->addCell($TableWidth, [])->addTextRun([])->addText('');
+    $leftCell = $TitleRow->addCell($TitleWidth, $DashedStyle);
     $leftCell->addText('客戶內部編號', $DashedStyle, $TextRunTop);
-    $leftCell->addText('(CLIENT.NO.)', $DashedStyle, $TextRun);
-    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextEnd)->addText('：');
-	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['CltFileID']);
+    $leftCell->addText('(CLIENT.NO.)', $DashedStyle, $TextEnd);
+    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextStart)->addText('：');
+	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['CltFileID'], $fontBiaokai12);
 
-    $TitleRow = $TitleTable->addRow(900, ['exactHeight' => true]);
-    $leftCell = $TitleRow->addCell($width, $DashedStyle);
+    $TitleRow = $TitleTable->addRow($LineHeight, ['exactHeight' => true]);
+    $TitleRow->addCell($TableWidth, [])->addTextRun([])->addText('');
+    $leftCell = $TitleRow->addCell($TitleWidth, $DashedStyle);
     $leftCell->addText('申請國家', $DashedStyle, $TextRunTop);
-    $leftCell->addText('(COUNTRY)', $DashedStyle, $TextRun);
-    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextEnd)->addText('：');
-	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['CountryName']);
+    $leftCell->addText('(COUNTRY)', $DashedStyle, $TextEnd);
+    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextStart)->addText('：');
+	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['CountryName'], $fontBiaokai12);
 
-    $TitleRow = $TitleTable->addRow(900, ['exactHeight' => true]);
-    $leftCell = $TitleRow->addCell($width, $DashedStyle);
+    $TitleRow = $TitleTable->addRow($LineHeight, ['exactHeight' => true]);
+    $TitleRow->addCell($TableWidth, [])->addTextRun([])->addText('');
+    $leftCell = $TitleRow->addCell($TitleWidth, $DashedStyle);
     $leftCell->addText('案 別', $DashedStyle, $TextRunTop);
-    $leftCell->addText('(CASE)', $DashedStyle, $TextRun);
-    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextEnd)->addText('：');
-	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['Receivable'][0]['WhatFor']);
+    $leftCell->addText('(CASE)', $DashedStyle, $TextEnd);
+    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextStart)->addText('：');
+	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['Receivable'][0]['WhatFor'], $fontBiaokai12);
 
-	$TitleRow = $TitleTable->addRow(900, ['exactHeight' => true]);
-    $leftCell = $TitleRow->addCell($width, $DashedStyle);
+	$TitleRow = $TitleTable->addRow($LineHeight, ['exactHeight' => true]);
+    $TitleRow->addCell($TableWidth, [])->addTextRun([])->addText('');
+    $leftCell = $TitleRow->addCell($TitleWidth, $DashedStyle);
     $leftCell->addText('申請日期', $DashedStyle, $TextRunTop);
-    $leftCell->addText('(APPLDAY.)', $DashedStyle, $TextRun);
-    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextEnd)->addText('：');
-	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['AppDate']);
+    $leftCell->addText('(APPLDAY.)', $DashedStyle, $TextEnd);
+    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextStart)->addText('：');
+	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['AppDate'], $fontBiaokai12);
 
-	$TitleRow = $TitleTable->addRow(900, ['exactHeight' => true]);
-    $leftCell = $TitleRow->addCell($width, $DashedStyle);
+	$TitleRow = $TitleTable->addRow($LineHeight, ['exactHeight' => true]);
+    $TitleRow->addCell($TableWidth, [])->addTextRun([])->addText('');
+    $leftCell = $TitleRow->addCell($TitleWidth, $DashedStyle);
     $leftCell->addText('申請案號', $DashedStyle, $TextRunTop);
-    $leftCell->addText('(APPL.NO.)', $DashedStyle, $TextRun);
-    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextEnd)->addText('：');
-	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['AppCaseld']);
+    $leftCell->addText('(APPL.NO.)', $DashedStyle, $TextEnd);
+    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextStart)->addText('：');
+	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['AppCaseld'], $fontBiaokai12);
 
-	$TitleRow = $TitleTable->addRow(900, ['exactHeight' => true]);
-    $leftCell = $TitleRow->addCell($width, $DashedStyle);
+	$TitleRow = $TitleTable->addRow($LineHeight, ['exactHeight' => true]);
+    $TitleRow->addCell($TableWidth, [])->addTextRun([])->addText('');
+    $leftCell = $TitleRow->addCell($TitleWidth, $DashedStyle);
     $leftCell->addText('申請名稱', $DashedStyle, $TextRunTop);
-    $leftCell->addText('(TITLE)', $DashedStyle, $TextRun);
-    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextEnd)->addText('：');
-	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['CTitle']);
+    $leftCell->addText('(TITLE)', $DashedStyle, $TextEnd);
+    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextStart)->addText('：');
+	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['CTitle'], $fontBiaokai12);
 
-    $TitleRow = $TitleTable->addRow(900, ['exactHeight' => true]);
-    $leftCell = $TitleRow->addCell($width, $DashedStyle);
+    $TitleRow = $TitleTable->addRow($LineHeight, ['exactHeight' => true]);
+    $TitleRow->addCell($TableWidth, [])->addTextRun([])->addText('');
+    $leftCell = $TitleRow->addCell($TitleWidth, $DashedStyle);
     $leftCell->addText('本所編號', $DashedStyle, $TextRunTop);
-    $leftCell->addText('(CO.NO.)', $DashedStyle, $TextRun);
-    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextEnd)->addText('：');
-	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['FileID']);
+    $leftCell->addText('(CO.NO.)', $DashedStyle, $TextEnd);
+    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextStart)->addText('：');
+	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['FileID'], $fontBiaokai12);
 
-    $TitleRow = $TitleTable->addRow(900, ['exactHeight' => true]);
-    $leftCell = $TitleRow->addCell($width, $DashedStyle);
+    $TitleRow = $TitleTable->addRow($LineHeight, ['exactHeight' => true]);
+    $TitleRow->addCell($TableWidth, [])->addTextRun([])->addText('');
+    $leftCell = $TitleRow->addCell($TitleWidth, $DashedStyle);
     $leftCell->addText('服務人員', $DashedStyle, $TextRunTop);
-    $leftCell->addText('(PECEPTIONIST)', $DashedStyle, $TextRun);
-    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextEnd)->addText('：');
-	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['PastSales']);
+    $leftCell->addText('(PECEPTIONIST)', $DashedStyle, $TextEnd);
+    $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextStart)->addText('：');
+	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['PastSales'], $fontBiaokai12);
 }
 
 
