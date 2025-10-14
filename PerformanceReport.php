@@ -317,7 +317,7 @@ foreach ($SaleTop as $i => $r) {
 if (count($Info) === 1) {
     $Info[] = ['', '查無資料', 0, 0, 0, 0];
 }
-renderPerformanceTableFixed($phpWord, $section, 'SaleTopList', '新客戶', $w, 6, $Info);
+renderPerformanceTableFixed($phpWord, $section, 'SaleTopList', '本月(季)業績前五名客戶', $w, 6, $Info);
 $section->addTextBreak(1);
 
 // ===== 11) S/A級客戶狀況： =====
