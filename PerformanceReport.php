@@ -311,8 +311,10 @@ $section->addTextBreak(1);
 $SaleTop = $Data['SaleTopList'];
 $Info = [['', '名稱', '專利數', '商標數', '業績', '服務費']];
 
-foreach ($SaleTop as $i => $r) {
-    $Info[] = [$i + 1, $r['CustomerCName'], $r['PatentCount'], $r['TrademarkCount'], number_format($r['Sale']), number_format($r['Incasesale'])];
+if ($SaleTop !== null) {
+    foreach ($SaleTop as $i => $r) {
+        $Info[] = [$i + 1, $r['CustomerCName'], $r['PatentCount'], $r['TrademarkCount'], number_format($r['Sale']), number_format($r['Incasesale'])];
+    }
 }
 if (count($Info) === 1) {
     $Info[] = ['', '查無資料', 0, 0, 0, 0];
@@ -377,17 +379,20 @@ if (count($Customer) === 0) {
 
 
 if($data['Code'] === 200) {
+    // 檔名
+    $fileName = '業績報告-' . $_GET["name"] . $_GET["year"] . '年' . $_GET["number"] . (  $_GET["type"] === 'Season' ? '季' : '月'). date('YmdHis') ;
+
 	// Save file
 	// echo write($phpWord, basename(__FILE__, '.php'), $writers);
     date_default_timezone_set('Asia/Taipei');
-	write($phpWord, date('YmdHis'), $writers);
+	write($phpWord, $fileName, $writers);
 	// if (!CLI) {
 	// 	include_once 'Sample_Footer.php';
 	// }
 
 
 	echo "<script language='javascript' type ='text/javascript'>"; 
-	echo "window.location.href = 'results/" . date('YmdHis') . ".docx';";
+	echo "window.location.href = 'results/" . $fileName . ".docx';";
 	echo 'document.getElementById("print").innerHTML = "檔案已下載完成。";';
 	echo "</script>"; 
 } else {
