@@ -380,8 +380,12 @@ if (count($Customer) === 0) {
 
 if($data['Code'] === 200) {
     // 檔名
-    $fileName = '業績報告-' . $_GET["name"] . $_GET["year"] . '年' . $_GET["number"] . (  $_GET["type"] === 'Season' ? '季' : '月'). date('YmdHis') ;
-
+    if ( $_GET["type"] === 'Year') {
+        $fileName = '業績報告-' . $_GET["name"] . $_GET["year"] . '年';
+    } else {
+        $fileName = '業績報告-' . $_GET["name"] . $_GET["year"] . '年' . $_GET["number"] . (  $_GET["type"] === 'Season' ? '季' : '月'). date('YmdHis') ;
+    }
+    
 	// Save file
 	// echo write($phpWord, basename(__FILE__, '.php'), $writers);
     date_default_timezone_set('Asia/Taipei');
