@@ -307,7 +307,7 @@ $row = $tbl->addRow(1000);
 $row->addCell(1, [])->addText('(自行填寫)', ['size' => 12], []);
 $section->addTextBreak(1);
 
-// ===== 10) 本月(季)業績前五名客戶： =====
+// ===== 10) 本月(季)(年)業績前十名客戶： =====
 $SaleTop = $Data['SaleTopList'];
 $Info = [['', '名稱', '專利數', '商標數', '業績', '服務費']];
 
@@ -319,7 +319,7 @@ if ($SaleTop !== null) {
 if (count($Info) === 1) {
     $Info[] = ['', '查無資料', 0, 0, 0, 0];
 }
-renderPerformanceTableFixed($phpWord, $section, 'SaleTopList', '本月(季)業績前五名客戶', $w, 6, $Info);
+renderPerformanceTableFixed($phpWord, $section, 'SaleTopList', '本月(季)(年)業績前十名客戶', $w, 6, $Info);
 $section->addTextBreak(1);
 
 // ===== 11) S/A級客戶狀況： =====
@@ -381,7 +381,7 @@ if (count($Customer) === 0) {
 if($data['Code'] === 200) {
     // 檔名
     if ( $_GET["type"] === 'Year') {
-        $fileName = '業績報告-' . $_GET["name"] . $_GET["year"] . '年';
+        $fileName = '業績報告-' . $_GET["name"] . $_GET["year"] . '年' . date('YmdHis');
     } else {
         $fileName = '業績報告-' . $_GET["name"] . $_GET["year"] . '年' . $_GET["number"] . (  $_GET["type"] === 'Season' ? '季' : '月'). date('YmdHis') ;
     }
