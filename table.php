@@ -536,7 +536,13 @@ if($data['Code'] == 200) {
 	$DiscountText = Discount(TotalPrice($Data, ''),$Data["CasePrice"],$Data["ContractDiscount"],$Data["OverDiscount"],1);
 	$DiscountNum = Discount(TotalPrice($Data, ''),$Data["CasePrice"],$Data["ContractDiscount"],$Data["OverDiscount"],0);
 	$section->addTextBreak(1);
-	$section->addText('●工作時數以下述計算後，再優惠'.$DiscountText.'折抵：', $fontStyle , $paragraphStyle);
+
+	if ($DiscountText === "無折扣") {
+		$section->addText('●工作時數以下述計算後：', $fontStyle , $paragraphStyle);
+
+	} else {
+		$section->addText('●工作時數以下述計算後，再優惠'.$DiscountText.'折抵：', $fontStyle , $paragraphStyle);
+	}
 }
 $i = 0;
 if($Data['PaymentType'] == 'P'){
@@ -600,7 +606,13 @@ if($Data['PaymentType'] == 'P'){
 	$CountRow->addCell($CountWidth, $CellCenter)->addTextRun($TextRun)->addText('合計');
 	$CountRow->addCell($CountWidth, $CellCenter)->addTextRun($TextRun)->addText(TotalPrice($Data, $HoursData['Name']));
 	$CountRow->addCell($CountWidth, $CellCenter)->addTextRun($TextRun)->addText('元;');
-	$CountRow->addCell($CountWidth, array('gridSpan' => 2, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText($DiscountText.'優惠');
+
+	if ($DiscountText === "無折扣") {
+		$CountRow->addCell($CountWidth, array('gridSpan' => 2, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText('');
+	} else {
+		$CountRow->addCell($CountWidth, array('gridSpan' => 2, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText($DiscountText.'優惠');
+	}
+	
 	$CountRow->addCell($CountWidth, $CellCenter)->addTextRun($TextRun)->addText(TotalPrice($Data, $HoursData['Name'])*$DiscountNum);
 	$CountRow->addCell($CountWidth, $CellCenter)->addTextRun($TextRun)->addText('元');
 }
@@ -643,7 +655,13 @@ if($Data['PaymentType'] == 'All'){
 	$CountRow->addCell($CountWidth, $CellCenter)->addTextRun($TextRun)->addText('合計');
 	$CountRow->addCell($CountWidth, $CellCenter)->addTextRun($TextRun)->addText($CountPersonalTotalPrice);
 	$CountRow->addCell($CountWidth, $CellCenter)->addTextRun($TextRun)->addText('元;');
-	$CountRow->addCell($CountWidth, array('gridSpan' => 2, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText($DiscountText.'優惠');
+
+	if ($DiscountText === "無折扣") {
+		$CountRow->addCell($CountWidth, array('gridSpan' => 2, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText('');
+	} else {
+		$CountRow->addCell($CountWidth, array('gridSpan' => 2, 'vMerge' => 'restart', 'valign' => 'center'))->addTextRun($TextRun)->addText($DiscountText.'優惠');
+	}
+	
 	$CountRow->addCell($CountWidth, $CellCenter)->addTextRun($TextRun)->addText($CountPersonalTotalPrice*$DiscountNum);
 	$CountRow->addCell($CountWidth, $CellCenter)->addTextRun($TextRun)->addText('元');
 }
