@@ -169,14 +169,33 @@ function NewForeignApplicationCaseSort(array $rows, int $chunkSize = 8): array {
 $data='';
 
 if(isset($_GET["id"]) && isset($_GET["number"]) && isset($_GET["type"]) && isset($_GET["year"])){
-	$data = array(
-		"function" => $_GET["function"],
-        "id" => $_GET["id"],
-        "name" => $_GET["name"],
-        "number" => (int)$_GET["number"],
-        "type" => $_GET["type"],
-        "year" => $_GET["year"],
-	);
+    if (strpos($_GET["DeptName"], '智權') !== false) {
+        $data = array(
+            "function" => ['All'],
+            "id" => $_GET["id"],
+            "name" => $_GET["name"],
+            "number" => (int)$_GET["number"],
+            "type" => $_GET["type"],
+            "year" => $_GET["year"],
+        );
+    } else {
+        $data = array(
+            "function" => [
+                'Performance',
+                'ProjectStatus',
+                'ForeignNewCase',
+                'SaleTop',
+                'Level',
+                'InternationalClient',
+                'InternationalForSales'
+            ],
+            "id" => $_GET["id"],
+            "name" => $_GET["name"],
+            "number" => (int)$_GET["number"],
+            "type" => $_GET["type"],
+            "year" => $_GET["year"],
+        );
+    }
 }else{
 	echo "Error : 參數錯誤";
 }
@@ -313,7 +332,16 @@ $Info = [
 ];
 
 if ($_GET["DeptName"] === '國際部') {
-    $Info[] = ['植物品種權', 
+    $Info[] = ['品種權申請', 
+    '台灣件數',  toCount('a', $Pro['PlantVarietyApply']['TaiwanCount']),
+    '台灣服務費', toCount('b', $Pro['PlantVarietyApply']['TaiwanIncasesale']), '去年同期', toCount('a', $Pro['PlantVarietyApply']['TaiwanCount'], $Pro['PlantVarietyApply']['TaiwanLastYearCount']), toCount('b', $Pro['PlantVarietyApply']['TaiwanIncasesale'], $Pro['PlantVarietyApply']['TaiwanLastYearIncasesale']),
+    ];
+    $Info[] = ['', 
+    '國外件數', toCount('a', $Pro['PlantVarietyApply']['ForeignCount']),
+    '國外服務費', toCount('b', $Pro['PlantVarietyApply']['ForeignIncasesale']), '去年同期', toCount('a', $Pro['PlantVarietyApply']['ForeignCount'], $Pro['PlantVarietyApply']['ForeignLastYearCount']), toCount('b', $Pro['PlantVarietyApply']['ForeignIncasesale'], $Pro['PlantVarietyApply']['ForeignLastYearIncasesale'])
+    ];
+
+    $Info[] = ['品種權其他', 
     '台灣件數',  toCount('a', $Pro['PlantVariety']['TaiwanCount']),
     '台灣服務費', toCount('b', $Pro['PlantVariety']['TaiwanIncasesale']), '去年同期', toCount('a', $Pro['PlantVariety']['TaiwanCount'], $Pro['PlantVariety']['TaiwanLastYearCount']), toCount('b', $Pro['PlantVariety']['TaiwanIncasesale'], $Pro['PlantVariety']['TaiwanLastYearIncasesale']),
     ];
@@ -353,6 +381,22 @@ $Info = [
 ];
 renderPerformanceTableFixed($phpWord, $section, 'NewClientSale', '新客戶', $w, 4, $Info);
 $section->addTextBreak(1);
+
+// ===== 7.5) 收款狀況報告： =====
+if (strpos($_GET["DeptName"], '智權') !== false) {
+    $PaymentStatusList = $Data['PaymentStatusList'];
+    $Info = [
+        ['月份', '本月預計收回款項', '本月已收回款項', '本月存貨金額', '平均請款天數', '本月未收款比率', '帳款回收效率(CEI)'],
+    ];
+
+    for ($i=0; $i < count($PaymentStatusList); $i++) {
+        $r = $PaymentStatusList[$i];
+        $Info[] = [$r['Date'], number_format($r['RcvbleAmt']), number_format($r['AmtRcved']), number_format($r['CumAmt']), $r['AvgBillingDays'], $r['UncollectedRatio'] . '%', $r['PriorUncollectedRatio'] . '%'];
+    }
+
+    renderPerformanceTableFixed($phpWord, $section, 'PaymentStatus', '收款狀況報告', $w, 7, $Info);
+    $section->addTextBreak(1);
+}
 
 // ===== 8) 截至目前未收款金額： =====
 $Rcv = $Data['Performance']['RcvbleBalance'];
