@@ -294,7 +294,7 @@ if ($documentType === 'domestic') {
     $table->addRow();
     $table->addCell(width(65), ['gridSpan' => 2])->addText($Data['WhatFor'], $fontStyle, $TLeft);
     $table->addCell(width(5), $hideRightLine)->addText($currency, $fontStyle, $TLeft);
-    $table->addCell(width(15), $hideLeftLine)->addText(number_format($amount), $fontStyle, $TRight);
+    $table->addCell(width(15), $hideLeftLine)->addText(number_format((float)$amount), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
     $table->addCell(width(10), $hideLeftLine)->addText(number_format($Data['InCaseSale2']), $fontStyle, $TRight);
 
@@ -302,7 +302,7 @@ if ($documentType === 'domestic') {
     $table->addCell(width(53), ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'borderBottomColor' => 'FFFFFF', 'borderBottomSize' => 0,])->addText('');
     $table->addCell(width(12))->addText('小計', $fontStyle, $TCenter);
     $table->addCell(width(5), $hideRightLine)->addText($currency, $fontStyle, $TLeft);
-    $table->addCell(width(15), $hideLeftLine)->addText(number_format($amount), $fontStyle, $TRight);
+    $table->addCell(width(15), $hideLeftLine)->addText(number_format((float)$amount), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText('NT$', $fontStyle, $TLeft);
     $table->addCell(width(10), $hideLeftLine)->addText(number_format($Data['InCaseSale2']), $fontStyle, $TRight);
 
@@ -403,7 +403,7 @@ if ($documentType !== 'domestic') {
     $section->addText(
         '代收代付國外收據',
         ['name' => 'Microsoft JhengHei', 'size' => 18,],
-        ['alignment' => Jc::CENTER, 'spaceAfter' => 0, 'lineHeight' => 0.7],
+        ['alignment' => Jc::CENTER, 'spaceAfter' => 0, 'lineHeight' => 1],
     );
     $section->addText(
         '(正本)',
@@ -426,25 +426,27 @@ if ($documentType !== 'domestic') {
         'width' => 100 * 50     // 設定寬度 100% (50 是 PHPWord 的百分比係數)
     ]);
 
-    $DLeft = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 0.7, 'indentation' => [ 'left'  => Converter::cmToTwip(1)]];
+    $DLeft = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 1, 'indentation' => [ 'left'  => Converter::cmToTwip(1)]];
 
     $infoTable->addRow();
     $infoTable->addCell(width(60))->addText('', $fontStyle, $DLeft);
-    $infoTable->addCell(width(10))->addText('客戶編號', $fontStyle, ['alignment' => 'distribute', 'lineHeight' => 0.7, 'spaceAfter' => 0]);
-    $infoTable->addCell(width(0.5))->addText('：', $fontStyle, ['lineHeight' => 0.7, 'spaceAfter' => 0]);
-    $infoTable->addCell(width(25))->addText($Data['CltFileID'], $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 0.7,]);
+    $infoTable->addCell(width(10))->addText('客戶編號', $fontStyle, ['alignment' => 'distribute', 'lineHeight' => 1, 'spaceAfter' => 0]);
+    $infoTable->addCell(width(0.5))->addText('：', $fontStyle, ['lineHeight' => 1, 'spaceAfter' => 0]);
+    $infoTable->addCell(width(25))->addText($Data['CltFileID'], $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 1,]);
 
     $infoTable->addRow();
     $infoTable->addCell(width(60))->addText('', $fontStyle, $DLeft);
-    $infoTable->addCell(width(10))->addText('收據單號', $fontStyle, ['alignment' => 'distribute', 'lineHeight' => 0.7, 'spaceAfter' => 0]);
-    $infoTable->addCell(width(0.5))->addText('：', $fontStyle, ['lineHeight' => 0.7, 'spaceAfter' => 0]);
-    $infoTable->addCell(width(25))->addText($rcvAcntNum, $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 0.7,]);
+    $infoTable->addCell(width(10))->addText('收據單號', $fontStyle, ['alignment' => 'distribute', 'lineHeight' => 1, 'spaceAfter' => 0]);
+    $infoTable->addCell(width(0.5))->addText('：', $fontStyle, ['lineHeight' => 1, 'spaceAfter' => 0]);
+    $infoTable->addCell(width(25))->addText($rcvAcntNum, $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 1,]);
 
     $infoTable->addRow();
     $infoTable->addCell(width(60))->addText('', $fontStyle, $DLeft);
     $infoTable->addCell(width(10))->addText('日期', $fontStyle, ['alignment' => 'distribute', 'lineHeight' => 1.0, ]);
     $infoTable->addCell(width(0.5))->addText('：', $fontStyle, ['lineHeight' => 1.0,]);
     $infoTable->addCell(width(25))->addText($rcvbleDue, $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'lineHeight' => 1.0,]);
+
+    $section->addTextBreak(1, ['size' => 3]);
 
     // ===== 2) 表格資訊 =====
     $table2Style = [
@@ -500,7 +502,7 @@ if ($documentType !== 'domestic') {
         $table->addCell(width(60))->addText('合計', $font2Style, $TLeft);
         $table->addCell(width(40))->addText(number_format((int)$Data['OfficialFee']*(float)$rate+(int)$Data['AgentFee']*(float)$rate), $font2Style, $TRight);
     } else if ($documentType === 'foreignJoin') {
-        $cell->addText('代收代付國外代理人費用('.$currency.number_format($amount).'*'.$rate.')', $font2Style, $TLeft);
+        $cell->addText('代收代付國外代理人費用('.$currency.number_format((float)$amount).'*'.$rate.')', $font2Style, $TLeft);
         $cell->addTextBreak(1);
         $cell = $table->addCell(width(40));
         $cell->addTextBreak(1);
@@ -509,9 +511,9 @@ if ($documentType !== 'domestic') {
 
         $table->addRow();
         $table->addCell(width(60))->addText('合計', $font2Style, $TLeft);
-        $table->addCell(width(40))->addText(number_format((int)$amount*(float)$rate), $font2Style, $TRight);
+        $table->addCell(width(40))->addText(number_format((float)$amount*(float)$rate), $font2Style, $TRight);
     } else if ($documentType === 'foreignSeparate') {
-        $cell->addText('代收代付國外規費('.$currency.number_format($foreignCurrencyAmount).'*'.$rate.')', $font2Style, $TLeft);
+        $cell->addText('代收代付國外規費('.$currency.number_format((float)$foreignCurrencyAmount).'*'.$rate.')', $font2Style, $TLeft);
         $cell->addText('代收代付國外代理人費用('.$currency.number_format($replaceAmount).'*'.$rate.')', $font2Style, $TLeft);
         $cell->addTextBreak(1);
         $cell = $table->addCell(width(40));
