@@ -503,29 +503,32 @@ if ($documentType !== 'domestic') {
         $table->addCell(width(60))->addText('合計', $font2Style, $TLeft);
         $table->addCell(width(40))->addText(number_format((int)$Data['OfficialFee']*(float)$rate+(int)$Data['AgentFee']*(float)$rate), $font2Style, $TRight);
     } else if ($documentType === 'foreignJoin') {
-        $cell->addText('代收代付國外代理人費用('.$currency.number_format((float)$amount).'*'.$rate.')', $font2Style, $TLeft);
+        $cell->addText('代收代付國外代理人費用('.$currency.(float)$amount.'*'.$rate.')', $font2Style, $TLeft);
         $cell->addTextBreak(1);
         $cell = $table->addCell(width(40));
         $cell->addTextBreak(1);
-        $cell->addText(number_format((int)$amount*(float)$rate), $font2Style, $TRight);
+        $cell->addText(number_format((float)$amount*(float)$rate), $font2Style, $TRight);
         $cell->addTextBreak(1);
 
         $table->addRow();
         $table->addCell(width(60))->addText('合計', $font2Style, $TLeft);
         $table->addCell(width(40))->addText(number_format((float)$amount*(float)$rate), $font2Style, $TRight);
     } else if ($documentType === 'foreignSeparate') {
-        $cell->addText('代收代付國外規費('.$currency.number_format((float)$foreignCurrencyAmount).'*'.$rate.')', $font2Style, $TLeft);
-        $cell->addText('代收代付國外代理人費用('.$currency.number_format($replaceAmount).'*'.$rate.')', $font2Style, $TLeft);
+        $cell->addText('代收代付國外規費('.$currency.((float)$foreignCurrencyAmount).'*'.$rate.')', $font2Style, $TLeft);
+        $cell->addText('代收代付國外代理人費用('.$currency.((float)$replaceAmount).'*'.$rate.')', $font2Style, $TLeft);
         $cell->addTextBreak(1);
         $cell = $table->addCell(width(40));
         $cell->addTextBreak(1);
-        $cell->addText(number_format((int)$foreignCurrencyAmount*(float)$rate), $font2Style, $TRight);
-        $cell->addText(number_format((int)$replaceAmount*(float)$rate), $font2Style, $TRight);
+
+        $foreignTotal = round((float)$foreignCurrencyAmount*(float)$rate);
+        $replaceTotal = round((float)$replaceAmount*(float)$rate);
+        $cell->addText(number_format($foreignTotal), $font2Style, $TRight);
+        $cell->addText(number_format($replaceTotal), $font2Style, $TRight);
         $cell->addTextBreak(1);
 
         $table->addRow();
         $table->addCell(width(60))->addText('合計', $font2Style, $TLeft);
-        $table->addCell(width(40))->addText(number_format((int)$foreignCurrencyAmount*(float)$rate+(int)$replaceAmount*(float)$rate), $font2Style, $TRight);
+        $table->addCell(width(40))->addText(number_format($foreignTotal+$replaceTotal), $font2Style, $TRight);
     }
     
 
