@@ -15,7 +15,7 @@ function httpRequest($api, $data_string) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/json',
         'Content-Length: ' . strlen($data_string),
-		'authorization: authorization ' . $_GET["token"]
+        'authorization: authorization ' . $_GET["token"]
     ));
     $result = curl_exec($ch);
     curl_close($ch);
@@ -23,7 +23,7 @@ function httpRequest($api, $data_string) {
     return json_decode($result, true);
 }
 
-// 寬度百分比計算
+// 寬度百分比計算 (總寬度基準為 11000 TWIP)
 function width($percent) {
     return $percent / 100 * 11000;
 }
@@ -54,12 +54,12 @@ use PhpOffice\PhpWord\Shared\Converter;
 $data='';
 
 if(isset($_GET["rcvAcntNum"]) && isset($_GET["type"])){
-	$data = array(
-		"rcvAcntNum" => $_GET["rcvAcntNum"], // 應收款單號
+    $data = array(
+        "rcvAcntNum" => $_GET["rcvAcntNum"], // 應收款單號
         "type" => $_GET["type"],             // 案件類型
-	);
+    );
 }else{
-	echo "Error : 參數錯誤";
+    echo "Error : 參數錯誤";
 }
 
 // 參數接收
@@ -81,16 +81,13 @@ if(isset($_GET["ReplaceAmount"])){
     $replaceAmount = $_GET["ReplaceAmount"];
 }
 
-
-
-$host = $_SERVER['HTTP_HOST']; // 例如 "192.168.0.52:8080" 或 "example.com"
+$host = $_SERVER['HTTP_HOST']; 
 if ($host === '192.168.0.52' || $host === '192.168.0.52:8080') {
     $data = httpRequest('http://192.168.0.52:8000/report/select-generatepaymentrequest', json_encode($data));
 } elseif ($host === '192.168.0.188' || $host === '192.168.0.188:8080') {
     $data = httpRequest('http://192.168.0.186:8000/report/select-generatepaymentrequest', json_encode($data));
 }
 $Data = $data['Data'];
-// echo json_encode($data, JSON_UNESCAPED_UNICODE);
 
 // New Word document
 include_once 'Sample_Header.php';
@@ -98,119 +95,103 @@ $phpWord = new \PhpOffice\PhpWord\PhpWord();
 
 // New portrait section
 $section = $phpWord->addSection(array(
-	'headerHeight' => 300,
+    'headerHeight' => 300,
     'marginTop' => 2000,
-	'marginLeft' => 0,
-    'marginRight' => 0,
-	'footerHeight' => 0,
+    // 🌟 修正：給予微小的左右邊界 (約0.7cm)，防止 WPS 或 Mac Pages 強制縮排導致跑版
+    'marginLeft' => 400,
+    'marginRight' => 400,
+    'footerHeight' => 0,
 ));
 
-// Add header for all other pages
+// ==========================================
+// 頁首 (Header) 設定
+// ==========================================
 $header = $section->addHeader();
 
+// 🌟 終極解法：使用「絕對定位」，直接對齊「實體紙張邊緣」，無視任何 Margin 限制！
+$headerImageStyle = array(
+    'width'            => 600,  // PhpWord 中給定寬度即會等比例縮放
+    'positioning'      => 'absolute', // 啟用絕對定位
+    'posHorizontal'    => 'left',     // 靠左
+    'posHorizontalRel' => 'page',     // 基準點：整張實體紙張 (無視左右邊界)
+    'posVertical'      => 'top',      // 靠上
+    'posVerticalRel'   => 'page',     // 基準點：整張實體紙張 (無視上下邊界)
+);
+
 if ($documentType === 'domestic') {
-
     if($_GET["type"] === 'Patent') {
-        $header->addImage('images/巨群信頭_專利請款單.png', 
-        array(
-            'width' => 600, 
-            'height' => 'auto', 
-        ));
+        $header->addImage('images/巨群信頭_專利請款單.png', $headerImageStyle);
     }
-
     if($_GET["type"] === 'TM') {
-        $header->addImage('images/巨群信頭_商標請款單.png', 
-        array(
-            'width' => 600, 
-            'height' => 'auto', 
-        ));
+        $header->addImage('images/巨群信頭_商標請款單.png', $headerImageStyle);
     }
-    
 } else if ($documentType !== 'domestic') {
-
     if($_GET["type"] === 'Patent') {
-        $header->addImage('images/巨群信頭_智財諮詢專利請款單.png', 
-        array(
-            'width' => 600, 
-            'height' => 'auto', 
-        ));
+        $header->addImage('images/巨群信頭_智財諮詢專利請款單.png', $headerImageStyle);
     }
-
     if($_GET["type"] === 'TM') {
-        $header->addImage('images/巨群信頭_智財諮詢商標請款單.png', 
-        array(
-            'width' => 600, 
-            'height' => 'auto', 
-        ));
+        $header->addImage('images/巨群信頭_智財諮詢商標請款單.png', $headerImageStyle);
     }
-
 } else {
-    $header->addImage('images/巨群信頭_國外請款單.png', 
-    array(
-        'width' => 600, 
-        'height' => 'auto', 
-    ));
+    $header->addImage('images/巨群信頭_國外請款單.png', $headerImageStyle);
 }
 
-// Add footer
+// ==========================================
+// 頁尾 (Footer) 設定
+// ==========================================
 $footer = $section->addFooter();
+
+// 🌟 頁尾一樣使用絕對定位，對齊紙張的「左下角」
+$footerImageStyle = array(
+    'width'            => 600, 
+    'positioning'      => 'absolute',
+    'posHorizontal'    => 'left',
+    'posHorizontalRel' => 'page', // 基準點：整張實體紙張的左邊
+    'posVertical'      => 'bottom', // 靠下
+    'posVerticalRel'   => 'page', // 基準點：整張實體紙張的最底端
+);
+
 if ($documentType === 'domestic') {
-
     if ($_GET["type"] === 'Patent') {
-        $footer->addImage('images/巨群信頭_巨群智財諮詢 Confidential 永豐1.png', 
-        array(
-            'width' => 600, 
-            'height' => 'auto', 
-        ));
+        $footer->addImage('images/巨群信頭_巨群智財諮詢 Confidential 永豐1.png', $footerImageStyle);
     }
-
     if ($_GET["type"] === 'TM') {
-        $footer->addImage('images/巨群信頭_巨群智財諮詢 Confidential 永豐2.png', 
-        array(
-            'width' => 600, 
-            'height' => 'auto', 
-        ));
+        $footer->addImage('images/巨群信頭_巨群智財諮詢 Confidential 永豐2.png', $footerImageStyle);
     }
-
-    
 } else {
-    $footer->addImage('images/巨群信頭_巨群智財諮詢 Confidential 富邦.png', 
-    array(
-        'width' => 600, 
-        'height' => 'auto', 
-    ));
+    $footer->addImage('images/巨群信頭_巨群智財諮詢 Confidential 富邦.png', $footerImageStyle);
 }
-
 
 // ===== 1) 文件標題 =====
 $section->addText(
     '請款單',
     ['name' => 'Microsoft JhengHei', 'size' => 26, 'bold' => true, 'underline' => 'double'],
-    ['alignment' => Jc::CENTER, 'spaceAfter' => 0,],
+    ['alignment' => Jc::CENTER, 'spaceAfter' => 0]
 );
 
 // ===== 2) 客戶資訊 =====
 $section->addText(
     $Data['CustomerCName'],
     ['name' => 'Microsoft JhengHei', 'size' => 14, 'bold' => true],
-    ['alignment' => Jc::START, 'spaceAfter' => 0, 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'lineHeight' => 0.7,],
+    ['alignment' => Jc::START, 'spaceAfter' => 0, 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'lineHeight' => 0.7]
 );
 $section->addText(
     $Data['ContactAddress'],
     ['name' => 'Microsoft JhengHei', 'size' => 14, 'bold' => true],
-    ['alignment' => Jc::START, 'spaceAfter' => 100, 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'lineHeight' => 0.7,],
+    ['alignment' => Jc::START, 'spaceAfter' => 100, 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'lineHeight' => 0.7]
 );
 
 $titleStyle = ['name' => 'Microsoft JhengHei', 'size' => 10, 'color' => '000000', 'bold' => true];
 $fontStyle = ['name' => 'Microsoft JhengHei', 'size' => 10, 'color' => '000000'];
 $CLeft = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 1.0, 'indentation' => [ 'left'  => Converter::cmToTwip(1)]];
 
+// 🌟 修正：基本資訊表格，單位改為 WIDTH_TWIP，總寬度 11000
 $infoTable = $section->addTable([
-    'borderSize' => 0,      // 邊框大小為 0
-    'borderColor' => 'FFFFFF', // 邊框顏色設為白色 (隱形)
-    'cellMargin' => 0,      // 儲存格無內距
-    'unit' => \PhpOffice\PhpWord\Style\Table::WIDTH_PERCENT, // 設定寬度單位為百分比
-    'width' => 100 * 50     // 設定寬度 100% (50 是 PHPWord 的百分比係數)
+    'borderSize' => 0,
+    'borderColor' => 'FFFFFF',
+    'cellMargin' => 0,
+    'unit' => \PhpOffice\PhpWord\Style\Table::WIDTH_TWIP, // 改用絕對寬度 TWIP
+    'width' => 11000 // 總長度 11000
 ]);
 $infoTable->addRow();
 $infoTable->addCell(5000)->addText('貴司編號：'.$Data['CltFileID'], $fontStyle, $CLeft);
@@ -230,28 +211,25 @@ if ($_GET["type"] === 'Patent') {
  $subtitle = '商標名稱：';
 }
 $infoTable->addRow();
-$infoTable->addCell(12500, ['gridSpan' => 2])->addText($subtitle.$Data['CTitle'], $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 100, 'lineHeight' => 1.0, 'indentation' => [ 'left'  => Converter::cmToTwip(1)]]);
+$infoTable->addCell(11000, ['gridSpan' => 2])->addText($subtitle.$Data['CTitle'], $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 100, 'lineHeight' => 1.0, 'indentation' => [ 'left'  => Converter::cmToTwip(1)]]);
 
 // ===== 3) 表格資訊 =====
-// 定義表格框線樣式
+// 🌟 修正：主表格樣式，單位改為 WIDTH_TWIP，總寬度 11000
 $tableStyle = [
     'borderSize' => 6, 
     'borderColor' => '000000', 
     'cellMargin' => 80,
-    'unit' => \PhpOffice\PhpWord\Style\Table::WIDTH_PERCENT,
-    'width' => 100 * 50,
-    'alignment' => Jc::CENTER,
-    'indent' => new \PhpOffice\PhpWord\ComplexType\TblWidth(
-        \PhpOffice\PhpWord\Shared\Converter::cmToTwip(2)
-    )
+    'unit' => \PhpOffice\PhpWord\Style\Table::WIDTH_TWIP, // 改用絕對寬度 TWIP
+    'width' => 11000, // 總長度 11000
+    'alignment' => Jc::CENTER
 ];
 $TCenter = ['alignment' => Jc::CENTER, 'spaceAfter' => 0, 'lineHeight' => 1.0];
 $TLeft = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 1.0];
 $TRight = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::END, 'spaceAfter' => 0, 'lineHeight' => 1.0];
 
-$hideRightLine = ['borderRightColor' => 'FFFFFF', 'borderRightSize' => 0,];
-$hideLeftLine = ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0,];
-$hideTitleLine = ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'borderBottomColor' => 'FFFFFF', 'borderBottomSize' => 0, 'borderTopColor' => 'FFFFFF', 'borderTopSize' => 0,];
+$hideRightLine = ['borderRightColor' => 'FFFFFF', 'borderRightSize' => 0];
+$hideLeftLine = ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0];
+$hideTitleLine = ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'borderBottomColor' => 'FFFFFF', 'borderBottomSize' => 0, 'borderTopColor' => 'FFFFFF', 'borderTopSize' => 0];
 
 $phpWord->addTableStyle('InvoiceTable', $tableStyle);
 // 2. 建立表格
@@ -272,7 +250,7 @@ if ($documentType === 'domestic') {
     $table->addCell(width(10), $hideLeftLine)->addText($inCaseSale2, $fontStyle, $TRight);
 
     $table->addRow();
-    $table->addCell(width(53), ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'borderBottomColor' => 'FFFFFF', 'borderBottomSize' => 0,])->addText('');
+    $table->addCell(width(53), ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'borderBottomColor' => 'FFFFFF', 'borderBottomSize' => 0])->addText('');
     $table->addCell(width(12))->addText('小計', $fontStyle, $TCenter);
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
     $table->addCell(width(15), $hideLeftLine)->addText(number_format($Data['OfficialFee']), $fontStyle, $TRight);
@@ -282,8 +260,8 @@ if ($documentType === 'domestic') {
     $table->addRow();
     $table->addCell(width(53), $hideTitleLine)->addText('');
     $table->addCell(width(12))->addText('合計', $fontStyle, $TCenter);
-    $table->addCell(width(20), ['gridSpan' => 2, 'borderRightColor' => 'FFFFFF', 'borderRightSize' => 0,])->addText('NTD', $fontStyle, $TLeft);
-    $table->addCell(width(15), ['gridSpan' => 2, 'borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0,])->addText(number_format($Data['OfficialFee'] + $inCaseSale2), $fontStyle, $TRight);
+    $table->addCell(width(20), ['gridSpan' => 2, 'borderRightColor' => 'FFFFFF', 'borderRightSize' => 0])->addText('NTD', $fontStyle, $TLeft);
+    $table->addCell(width(15), ['gridSpan' => 2, 'borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0])->addText(number_format($Data['OfficialFee'] + $inCaseSale2), $fontStyle, $TRight);
 
 } else if ($documentType === 'foreignJoin') {
     // 國外案合
@@ -300,7 +278,7 @@ if ($documentType === 'domestic') {
     $table->addCell(width(10), $hideLeftLine)->addText($inCaseSale2, $fontStyle, $TRight);
 
     $table->addRow();
-    $table->addCell(width(53), ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'borderBottomColor' => 'FFFFFF', 'borderBottomSize' => 0,])->addText('');
+    $table->addCell(width(53), ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'borderBottomColor' => 'FFFFFF', 'borderBottomSize' => 0])->addText('');
     $table->addCell(width(12))->addText('小計', $fontStyle, $TCenter);
     $table->addCell(width(5), $hideRightLine)->addText($currency, $fontStyle, $TLeft);
     $table->addCell(width(15), $hideLeftLine)->addText(((float)$amount), $fontStyle, $TRight);
@@ -332,8 +310,8 @@ if ($documentType === 'domestic') {
     $table->addRow();
     $table->addCell(width(53), $hideTitleLine)->addText('');
     $table->addCell(width(12))->addText('合計', $fontStyle, $TCenter);
-    $table->addCell(width(20), ['gridSpan' => 2, 'borderRightColor' => 'FFFFFF', 'borderRightSize' => 0,])->addText('NTD', $fontStyle, $TLeft);
-    $table->addCell(width(15), ['gridSpan' => 2, 'borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0,])->addText(Total($amount, $rate, $inCaseSale2), $fontStyle, $TRight);
+    $table->addCell(width(20), ['gridSpan' => 2, 'borderRightColor' => 'FFFFFF', 'borderRightSize' => 0])->addText('NTD', $fontStyle, $TLeft);
+    $table->addCell(width(15), ['gridSpan' => 2, 'borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0])->addText(Total($amount, $rate, $inCaseSale2), $fontStyle, $TRight);
 
 } else {
     // 國外案分
@@ -396,7 +374,9 @@ if ($documentType === 'domestic') {
     $table->addCell(width(40), ['gridSpan' => 2, 'borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'gridSpan' => 5])->addText(Total($foreignCurrencyAmount+$replaceAmount, $rate, $inCaseSale2), $fontStyle, $TRight);
 }
 
-
+// ----------------------------------------------------
+// 第 2 頁：代收代付國外收據 (只有國外案顯示)
+// ----------------------------------------------------
 if ($documentType !== 'domestic') {
     $section->addPageBreak();
     
@@ -404,27 +384,28 @@ if ($documentType !== 'domestic') {
     $section->addText(
         '代收代付國外收據',
         ['name' => 'Microsoft JhengHei', 'size' => 18,],
-        ['alignment' => Jc::CENTER, 'spaceAfter' => 0, 'lineHeight' => 1],
+        ['alignment' => Jc::CENTER, 'spaceAfter' => 0, 'lineHeight' => 1]
     );
     $section->addText(
         '(正本)',
         ['name' => 'Microsoft JhengHei', 'size' => 14,],
-        ['alignment' => Jc::CENTER, 'spaceAfter' => 0, 'lineHeight' => 0.7],
+        ['alignment' => Jc::CENTER, 'spaceAfter' => 0, 'lineHeight' => 0.7]
     );
 
     // ===== 2) 客戶資訊 =====
     $section->addText(
         $Data['CustomerCName'],
         ['name' => 'Microsoft JhengHei', 'size' => 14],
-        ['alignment' => Jc::START, 'spaceAfter' => 0, 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'lineHeight' => 0.7,],
+        ['alignment' => Jc::START, 'spaceAfter' => 0, 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'lineHeight' => 0.7]
     );
 
+    // 🌟 修正：收據的客戶資訊表，單位改為 WIDTH_TWIP，總寬度 11000
     $infoTable = $section->addTable([
-        'borderSize' => 0,      // 邊框大小為 0
-        'borderColor' => 'FFFFFF', // 邊框顏色設為白色 (隱形)
-        'cellMargin' => 0,      // 儲存格無內距
-        'unit' => \PhpOffice\PhpWord\Style\Table::WIDTH_PERCENT, // 設定寬度單位為百分比
-        'width' => 100 * 50     // 設定寬度 100% (50 是 PHPWord 的百分比係數)
+        'borderSize' => 0,
+        'borderColor' => 'FFFFFF',
+        'cellMargin' => 0,
+        'unit' => \PhpOffice\PhpWord\Style\Table::WIDTH_TWIP, // 改用絕對寬度 TWIP
+        'width' => 11000 // 總長度 11000
     ]);
 
     $DLeft = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 1, 'indentation' => [ 'left'  => Converter::cmToTwip(1)]];
@@ -433,57 +414,45 @@ if ($documentType !== 'domestic') {
     $infoTable->addCell(width(60))->addText('', $fontStyle, $DLeft);
     $infoTable->addCell(width(10))->addText('客戶編號', $fontStyle, ['alignment' => 'distribute', 'lineHeight' => 1, 'spaceAfter' => 0]);
     $infoTable->addCell(width(0.5))->addText('：', $fontStyle, ['lineHeight' => 1, 'spaceAfter' => 0]);
-    $infoTable->addCell(width(25))->addText($Data['CltFileID'], $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 1,]);
+    $infoTable->addCell(width(25))->addText($Data['CltFileID'], $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 1]);
 
     $infoTable->addRow();
     $infoTable->addCell(width(60))->addText('', $fontStyle, $DLeft);
     $infoTable->addCell(width(10))->addText('收據單號', $fontStyle, ['alignment' => 'distribute', 'lineHeight' => 1, 'spaceAfter' => 0]);
     $infoTable->addCell(width(0.5))->addText('：', $fontStyle, ['lineHeight' => 1, 'spaceAfter' => 0]);
-    $infoTable->addCell(width(25))->addText($rcvAcntNum, $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 1,]);
+    $infoTable->addCell(width(25))->addText($rcvAcntNum, $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 1]);
 
     $infoTable->addRow();
     $infoTable->addCell(width(60))->addText('', $fontStyle, $DLeft);
-    $infoTable->addCell(width(10))->addText('日期', $fontStyle, ['alignment' => 'distribute', 'lineHeight' => 1.0, ]);
-    $infoTable->addCell(width(0.5))->addText('：', $fontStyle, ['lineHeight' => 1.0,]);
-    $infoTable->addCell(width(25))->addText($rcvbleDue, $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'lineHeight' => 1.0,]);
+    $infoTable->addCell(width(10))->addText('日期', $fontStyle, ['alignment' => 'distribute', 'lineHeight' => 1.0 ]);
+    $infoTable->addCell(width(0.5))->addText('：', $fontStyle, ['lineHeight' => 1.0]);
+    $infoTable->addCell(width(25))->addText($rcvbleDue, $fontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'lineHeight' => 1.0]);
 
     $section->addTextBreak(1, ['size' => 3]);
 
-    // ===== 2) 表格資訊 =====
+    // ===== 3) 收據表格資訊 =====
+    // 🌟 修正：收據主表格，單位改為 WIDTH_TWIP，總寬度 11000
     $table2Style = [
-        // 1. 設定邊框顏色
         'borderColor' => '000000',
-        
-        // 2. 設定邊框大小 (建議設大一點，例如 12 或 18，才看得出粗細差別)
         'borderSize'  => 15,
-        
-        // 3. 【關鍵】設定邊框樣式為 "粗-細"
         'borderStyle' => 'thickThinSmallGap', 
-        
-        // 4. (選用) 如果你希望裡面還是普通的單線，要分開設定 inside
         'insideRowBorderBorderStyle' => 'single',
         'insideRowBorderSize' => 1,
         'insideColBorderBorderStyle' => 'single',
         'insideColBorderSize' => 1,
         'cellMargin' => 80,
-        'unit' => \PhpOffice\PhpWord\Style\Table::WIDTH_PERCENT,
-        'width' => 100 * 50,
-        'alignment' => Jc::CENTER,
-        'indent' => new \PhpOffice\PhpWord\ComplexType\TblWidth(
-            \PhpOffice\PhpWord\Shared\Converter::cmToTwip(2)
-        )
+        'unit' => \PhpOffice\PhpWord\Style\Table::WIDTH_TWIP, // 改用絕對寬度 TWIP
+        'width' => 11000, // 總長度 11000
+        'alignment' => Jc::CENTER
     ];
     $font2Style = ['name' => 'Microsoft JhengHei', 'size' => 12, 'color' => '000000'];
 
     $phpWord->addTableStyle('ReceiptTable', $table2Style);
     $table = $section->addTable('ReceiptTable');
+    
     $table->addRow();
     $table->addCell(width(60))->addText('項目', $font2Style, $TCenter);
-    $table->addCell(width(60))->addText('金額(NTD)', $font2Style, $TCenter);
-
-    // $table->addRow();
-    // $table->addCell(width(60))->addText('代收代付國外代理人服務費('.$currency.$amount.'*'.$rate.')', $font2Style, $TLeft);
-    // $table->addCell(width(40))->addText(number_format((int)$amount*(float)$rate), $font2Style, $TRight);
+    $table->addCell(width(40))->addText('金額(NTD)', $font2Style, $TCenter);
 
     $table->addRow();
     $cell = $table->addCell(width(60));
@@ -531,7 +500,6 @@ if ($documentType !== 'domestic') {
         $table->addCell(width(40))->addText(number_format($foreignTotal+$replaceTotal), $font2Style, $TRight);
     }
     
-
     $table->addRow();
     $cell = $table->addCell(width(100), ['gridSpan' => 2]);
     $cell->addText($Data['WhatFor'], $font2Style, $TLeft);
@@ -539,62 +507,25 @@ if ($documentType !== 'domestic') {
     $cell->addText('申請案號：'.$Data['AppCaseld'], $font2Style, $TLeft);
     $cell->addText('本所編號：'.$Data['FileId'], $font2Style, $TLeft);
     $cell->addText('客戶內部編號：'.$Data['CltFileID'], $font2Style, $TLeft);
-
-    // $transferTable = $section->addTable([
-    //     'borderSize' => 0,      // 邊框大小為 0
-    //     'borderColor' => 'FFFFFF', // 邊框顏色設為白色 (隱形)
-    //     'cellMargin' => 0,      // 儲存格無內距
-    //     'unit' => \PhpOffice\PhpWord\Style\Table::WIDTH_PERCENT, // 設定寬度單位為百分比
-    //     'width' => 100 * 50     // 設定寬度 100% (50 是 PHPWord 的百分比係數)
-    // ]);
-    // $font3Style = ['name' => 'Microsoft JhengHei', 'size' => 12, 'color' => '000000'];
-
-    // $transferTable->addRow();
-    // $transferTable->addCell(width(30), ['gridSpan' => 2])->addText('煩請  貴客戶匯至下列帳戶：', $font3Style, ['alignment' => Jc::START, 'spaceAfter' => 0, 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'spaceBefore' => Converter::cmToTwip(0.75),]);
-
-    // $transferTable->addRow();
-    // $transferTable->addCell(width(5))->addText('銀行', $font3Style, ['alignment' => 'distribute', 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'lineHeight' => 0.7,]);
-    // $transferTable->addCell(width(10))->addText('： 台北富邦銀行(八德分行)', $font3Style, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 0.7,]);
-    
-    // $transferTable->addRow();
-    // $transferTable->addCell(width(5))->addText('銀行代號', $font3Style, ['alignment' => 'distribute', 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'lineHeight' => 0.7,]);
-    // $transferTable->addCell(width(10))->addText('： 012', $font3Style, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 0.7,]);
-
-    // $transferTable->addRow();
-    // $transferTable->addCell(width(5))->addText('戶名', $font3Style, ['alignment' => 'distribute', 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'lineHeight' => 0.7,]);
-    // $transferTable->addCell(width(10))->addText('： 巨群智財諮詢有限公司', $font3Style, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 0.7,]);
-
-    // $transferTable->addRow();
-    // $transferTable->addCell(width(5))->addText('帳號', $font3Style, ['alignment' => 'distribute', 'indentation' => [ 'left'  => Converter::cmToTwip(1)], 'lineHeight' => 0.7,]);
-    // $transferTable->addCell(width(10))->addText('： 34010209427-7', $font3Style, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::START, 'spaceAfter' => 0, 'lineHeight' => 0.7,]);
 }
-
-
-
 
 if($data['Code'] === 200) {
     // 檔名
     $fileName = '財務部請款單_'. $Data['CustomerCName'] . ' ' . date('YmdHis');
     
-	// Save file
-	// echo write($phpWord, basename(__FILE__, '.php'), $writers);
     date_default_timezone_set('Asia/Taipei');
-	write($phpWord, $fileName, $writers);
-	// if (!CLI) {
-	// 	include_once 'Sample_Footer.php';
-	// }
+    write($phpWord, $fileName, $writers);
 
-
-	echo "<script language='javascript' type ='text/javascript'>"; 
-	echo "window.location.href = 'results/" . $fileName . ".docx';";
-	echo 'document.getElementById("print").innerHTML = "檔案已下載完成。";';
-	echo "</script>"; 
+    echo "<script language='javascript' type ='text/javascript'>"; 
+    echo "window.location.href = 'results/" . $fileName . ".docx';";
+    echo 'document.getElementById("print").innerHTML = "檔案已下載完成。";';
+    echo "</script>"; 
 } else {
-	echo "<script language='javascript' type ='text/javascript'>"; 
+    echo "<script language='javascript' type ='text/javascript'>"; 
 
     $text = 'document.getElementById("print").innerHTML = "檔案下載失敗。';
     $text.= '<br> 未取得資料API錯誤。 <br>';
     
     echo $text . '";';
-	echo "</script>"; 
+    echo "</script>"; 
 }
