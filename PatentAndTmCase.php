@@ -24,22 +24,54 @@ function httpRequest($api, $data_string) {
 }
 
 // POST
-$data='';
+$payloadArray = array();
 
 if(isset($_GET["FileID"])){
-	$data = array(
-		"FileID" => $_GET["FileID"],
+    $payloadArray = array(
+        "FileID" => $_GET["FileID"],
         "PageList" => array('info', 'receivable1')
-	);
+    );
 }else{
-	echo "Error : No FileID";
+    echo "Error : No FileID";
 }
 
-$data = httpRequest('http://192.168.0.52:8000/report/select-patentinfopublic', json_encode($data));
-$Data = $data['Data'];
-// echo json_encode($data, JSON_UNESCAPED_UNICODE);
+// ==========================================
+// 🌟 新增：動態判斷正式機/測試機的 API 網址
+// ==========================================
+$host = $_SERVER['HTTP_HOST']; 
+if ($host === '192.168.0.52' || $host === '192.168.0.52:8080') {
+    $apiBaseUrl = 'http://192.168.0.52:8000';
+} else {
+    $apiBaseUrl = 'http://192.168.0.186:8000';
+}
 
-// New Word document
+// 將陣列轉為 JSON 字串並呼叫 API (動態變數 + API 路徑)
+$payloadJson = json_encode($payloadArray);
+$data = httpRequest($apiBaseUrl . '/report/select-patentinfopublic', $payloadJson);
+
+// 避免 API 沒回傳 Data 導致後續報錯，加上 isset 保護
+$Data = isset($data['Data']) ? $data['Data'] : array();
+
+// ==========================================
+// 🚨 API 資料檢查站 (Debug 模式)
+// ==========================================
+if (isset($_GET['debug']) && $_GET['debug'] === '1') {
+    echo "<meta charset='utf-8'>";
+    echo "<div style='font-family: Arial; padding: 20px;'>";
+    echo "<h2 style='color: blue;'>🔍 API 傳送出去的參數 (Payload)：</h2>";
+    echo "<pre style='background: #f4f4f4; padding: 10px; border-radius: 5px;'>" . print_r($payloadArray, true) . "</pre>";
+    
+    echo "<h2 style='color: purple;'>🔗 實際呼叫的 API 網址：</h2>";
+    echo "<pre style='background: #f4f4f4; padding: 10px; border-radius: 5px;'>" . $apiBaseUrl . "/report/select-patentinfopublic</pre>";
+    
+    echo "<hr>";
+    
+    echo "<h2 style='color: green;'>📦 API 真實回傳的完整資料 (Response)：</h2>";
+    echo "<pre style='background: #f4f4f4; padding: 10px; border-radius: 5px;'>" . print_r($data, true) . "</pre>";
+    echo "</div>";
+    exit; // 停止執行，畫面會停在這裡，不會繼續產 Word
+}
+// ==========================================
 include_once 'Sample_Header.php';
 $phpWord = new \PhpOffice\PhpWord\PhpWord();
 
@@ -232,7 +264,7 @@ if($data['Code'] == 200 && $Data['PatentInfo']['FileID'] && !empty($Data['Receiv
     $leftCell->addText('服務人員', $DashedStyle, $TextRunTop);
     $leftCell->addText('(PECEPTIONIST)', $DashedStyle, $TextEnd);
     $TitleRow->addCell(100, $SubtStyle)->addTextRun($TextStart)->addText('：');
-	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['PastSales'], $fontBiaokai12);
+	$TitleRow->addCell($width, $DashedContentStyle)->addTextRun($TextRun)->addText($Data['PatentInfo']['SalesName'], $fontBiaokai12);
 }
 
 
