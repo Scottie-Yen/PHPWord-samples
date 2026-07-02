@@ -247,7 +247,7 @@ if ($documentType === 'domestic') {
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
     $table->addCell(width(15), $hideLeftLine)->addText(number_format($Data['OfficialFee']), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
-    $table->addCell(width(10), $hideLeftLine)->addText($inCaseSale2, $fontStyle, $TRight);
+    $table->addCell(width(10), $hideLeftLine)->addText(number_format($inCaseSale2), $fontStyle, $TRight);
 
     $table->addRow();
     $table->addCell(width(53), ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'borderBottomColor' => 'FFFFFF', 'borderBottomSize' => 0])->addText('');
@@ -255,7 +255,7 @@ if ($documentType === 'domestic') {
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
     $table->addCell(width(15), $hideLeftLine)->addText(number_format($Data['OfficialFee']), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
-    $table->addCell(width(10), $hideLeftLine)->addText($inCaseSale2, $fontStyle, $TRight);
+    $table->addCell(width(10), $hideLeftLine)->addText(number_format($inCaseSale2), $fontStyle, $TRight);
 
     $table->addRow();
     $table->addCell(width(53), $hideTitleLine)->addText('');
@@ -273,17 +273,17 @@ if ($documentType === 'domestic') {
     $table->addRow();
     $table->addCell(width(65), ['gridSpan' => 2])->addText($Data['WhatFor'], $fontStyle, $TLeft);
     $table->addCell(width(5), $hideRightLine)->addText($currency, $fontStyle, $TLeft);
-    $table->addCell(width(15), $hideLeftLine)->addText(((float)$amount), $fontStyle, $TRight);
+    $table->addCell(width(15), $hideLeftLine)->addText((number_format((float)$amount)), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
-    $table->addCell(width(10), $hideLeftLine)->addText($inCaseSale2, $fontStyle, $TRight);
+    $table->addCell(width(10), $hideLeftLine)->addText(number_format($inCaseSale2), $fontStyle, $TRight);
 
     $table->addRow();
     $table->addCell(width(53), ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'borderBottomColor' => 'FFFFFF', 'borderBottomSize' => 0])->addText('');
     $table->addCell(width(12))->addText('小計', $fontStyle, $TCenter);
     $table->addCell(width(5), $hideRightLine)->addText($currency, $fontStyle, $TLeft);
-    $table->addCell(width(15), $hideLeftLine)->addText(((float)$amount), $fontStyle, $TRight);
+    $table->addCell(width(15), $hideLeftLine)->addText((number_format((float)$amount)), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText('NT$', $fontStyle, $TLeft);
-    $table->addCell(width(10), $hideLeftLine)->addText($inCaseSale2, $fontStyle, $TRight);
+    $table->addCell(width(10), $hideLeftLine)->addText(number_format($inCaseSale2), $fontStyle, $TRight);
 
     $table->addRow();
     $table->addCell(width(53), $hideTitleLine)->addText('');
@@ -298,7 +298,7 @@ if ($documentType === 'domestic') {
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
     $table->addCell(width(15), $hideLeftLine)->addText(Approximately((float)$amount, (float)$rate), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
-    $table->addCell(width(10), $hideLeftLine)->addText($inCaseSale2, $fontStyle, $TRight);
+    $table->addCell(width(10), $hideLeftLine)->addText(number_format($inCaseSale2), $fontStyle, $TRight);
 
     $table->addRow();
     $table->addCell(width(53), $hideTitleLine)->addText('');
@@ -326,20 +326,20 @@ if ($documentType === 'domestic') {
     $table->addCell(width(27.5))->addText($Data['WhatFor'], $fontStyle, $TLeft);
     $table->addCell(width(27.5), ['gridSpan' => 2])->addText('', $fontStyle, $TLeft);
     $table->addCell(width(5), $hideRightLine)->addText($currency, $fontStyle, $TLeft);
-    $table->addCell(width(10), $hideLeftLine)->addText(($foreignCurrencyAmount), $fontStyle, $TRight);
+    $table->addCell(width(10), $hideLeftLine)->addText(number_format($foreignCurrencyAmount), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText($currency, $fontStyle, $TLeft);
-    $table->addCell(width(10), $hideLeftLine)->addText(($replaceAmount), $fontStyle, $TRight);
+    $table->addCell(width(10), $hideLeftLine)->addText(number_format($replaceAmount), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
-    $table->addCell(width(10), $hideLeftLine)->addText(($inCaseSale2), $fontStyle, $TRight);
+    $table->addCell(width(10), $hideLeftLine)->addText((number_format($inCaseSale2)), $fontStyle, $TRight);
 
     $table->addRow();
     $table->addCell(width(27.5), ['borderSize' => 0, 'borderColor' => 'FFFFFF'])->addText('');
     $table->addCell(width(15.5), ['borderSize' => 0, 'borderColor' => 'FFFFFF'])->addText('');
     $table->addCell(width(12))->addText('小計', $fontStyle, $TCenter);
     $table->addCell(width(5), $hideRightLine)->addText($currency, $fontStyle, $TLeft);
-    $table->addCell(width(25), ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'gridSpan' => 3])->addText(($foreignCurrencyAmount+$replaceAmount), $fontStyle, $TRight);
+    $table->addCell(width(25), ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'gridSpan' => 3])->addText(number_format($foreignCurrencyAmount+$replaceAmount), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
-    $table->addCell(width(10), $hideLeftLine)->addText(($inCaseSale2), $fontStyle, $TRight);
+    $table->addCell(width(10), $hideLeftLine)->addText((number_format($inCaseSale2)), $fontStyle, $TRight);
 
     $table->addRow();
     $table->addCell(width(27.5), ['borderSize' => 0, 'borderColor' => 'FFFFFF'])->addText('');
@@ -356,7 +356,7 @@ if ($documentType === 'domestic') {
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
     $table->addCell(width(25), ['borderLeftColor' => 'FFFFFF', 'borderLeftSize' => 0, 'gridSpan' => 3])->addText(Approximately(((float)$foreignCurrencyAmount+(float)$replaceAmount), (float)$rate), $fontStyle, $TRight);
     $table->addCell(width(5), $hideRightLine)->addText('NTD', $fontStyle, $TLeft);
-    $table->addCell(width(10), $hideLeftLine)->addText(($inCaseSale2), $fontStyle, $TRight);
+    $table->addCell(width(10), $hideLeftLine)->addText(number_format($inCaseSale2), $fontStyle, $TRight);
 
     $table->addRow();
     $table->addCell(width(27.5), ['borderSize' => 0, 'borderColor' => 'FFFFFF'])->addText('');
